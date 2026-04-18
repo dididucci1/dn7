@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DN7 &mdash; Desenvolvimento &amp; Conexões &middot; 2ª Edição Presencial &middot; Curitiba</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#ffffff; --bg2:#f4f6f9; --ink:#000000; --ink2:#333333; --ink3:#666666;
+      --border:#dde3ec; --primary:#111111;
+      --accent:#1d4ed8; --accent-lt:#3b82f6; --accent-bg:#eff6ff;
+      --radius:12px; --radius-lg:20px;
+      --shadow:0 2px 16px rgba(0,0,0,.07);
+      --shadow-md:0 8px 32px rgba(0,0,0,.10);
+      --shadow-lg:0 20px 60px rgba(0,0,0,.13);
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--ink); line-height:1.65; overflow-x:hidden; }
+    .container    { max-width:1100px; margin:0 auto; padding:0 28px; }
+    .container-sm { max-width:780px;  margin:0 auto; padding:0 28px; }
+    section { padding:96px 0; }
+
+    /* UTILS */
+    .eyebrow { display:inline-flex; align-items:center; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); background:var(--accent-bg); border:1px solid rgba(29,78,216,.25); padding:5px 14px; border-radius:100px; margin-bottom:20px; }
+    .section-title { font-size:clamp(28px,4.5vw,44px); font-weight:800; line-height:1.12; letter-spacing:-.02em; }
+    .section-sub   { font-size:17px; color:var(--ink3); margin-top:16px; line-height:1.7; }
+    .btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:#fff; font-weight:700; font-size:15px; padding:15px 32px; border-radius:100px; text-decoration:none; transition:transform .2s,box-shadow .2s,background .2s; box-shadow:0 4px 20px rgba(29,78,216,.35); white-space:nowrap; }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(29,78,216,.5); background:var(--accent-lt); }
+    .btn-outline { display:inline-flex; align-items:center; gap:8px; background:transparent; color:var(--ink); font-weight:600; font-size:15px; padding:14px 28px; border-radius:100px; text-decoration:none; border:1.5px solid var(--border); transition:border-color .2s,background .2s; white-space:nowrap; }
+    .btn-outline:hover { border-color:var(--accent); background:var(--accent-bg); color:var(--accent); }
+    .chip { display:inline-flex; align-items:center; font-size:13px; font-weight:500; color:var(--ink2); background:var(--bg2); border:1px solid var(--border); padding:6px 14px; border-radius:100px; }
+
+    /* NAV */
+    nav { position:sticky; top:0; z-index:200; background:rgba(255,255,255,.92); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+    .nav-inner { display:flex; align-items:center; justify-content:space-between; height:68px; gap:24px; }
+    .nav-logo { font-size:22px; font-weight:900; letter-spacing:-.03em; color:var(--ink); text-decoration:none; display:flex; align-items:center; gap:10px; }
+    .nav-logo-badge { background:var(--accent); color:#fff; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; }
+    .nav-links { display:flex; align-items:center; gap:4px; list-style:none; }
+    .nav-links a { font-size:14px; font-weight:500; color:var(--ink2); text-decoration:none; padding:6px 14px; border-radius:8px; transition:background .15s; }
+    .nav-links a:hover { background:var(--bg2); color:var(--ink); }
+    @media(max-width:768px){ .nav-links,.nav-cta { display:none; } }
+
+    /* HERO */
+    .hero { padding:72px 0 96px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-120px; right:-180px; width:700px; height:700px; background:radial-gradient(circle,rgba(212,160,23,.10) 0%,transparent 65%); pointer-events:none; }
+    .hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; position:relative; z-index:1; }
+    @media(max-width:860px){ .hero-grid { grid-template-columns:1fr; } .hero-visual { display:none; } }
+    .hero-chips { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px; }
+    .hero h1 { font-size:clamp(36px,5.5vw,60px); font-weight:900; line-height:1.06; letter-spacing:-.03em; margin-bottom:22px; }
+    .hero h1 mark { background:linear-gradient(135deg,var(--accent),var(--accent-lt)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-desc { font-size:17px; color:var(--ink2); line-height:1.75; margin-bottom:36px; max-width:480px; }
+    .hero-actions { display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom:48px; }
+    .hero-stats { display:flex; gap:32px; padding-top:36px; border-top:1px solid var(--border); }
+    .hero-stat strong { display:block; font-size:26px; font-weight:900; }
+    .hero-stat span   { font-size:12px; font-weight:500; color:var(--ink3); text-transform:uppercase; letter-spacing:.08em; }
+
+    /* Hero card */
+    .hero-card-main { background:var(--primary); border-radius:var(--radius-lg); padding:36px; box-shadow:var(--shadow-lg); color:#fff; }
+    .hc-label { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-lt); margin-bottom:20px; }
+    .hc-title { font-size:18px; font-weight:800; margin-bottom:24px; }
+    .hc-row { display:flex; align-items:flex-start; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+    .hc-row:last-child { border-bottom:none; }
+    .hc-icon { width:42px; height:42px; border-radius:12px; background:rgba(59,130,246,.2); border:1px solid rgba(59,130,246,.35); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+    .hc-row strong { font-size:15px; display:block; margin-bottom:3px; }
+    .hc-row p { font-size:13px; color:rgba(255,255,255,.55); }
+    .hero-float { position:absolute; bottom:-18px; left:-24px; background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:14px 18px; box-shadow:var(--shadow-md); display:flex; gap:12px; align-items:center; }
+    .hero-float .dot { width:40px; height:40px; background:var(--accent-bg); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .hero-float strong { font-size:14px; display:block; }
+    .hero-float span   { font-size:12px; color:var(--ink3); }
+
+    /* STRIP */
+    .strip { background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:26px 0; }
+    .strip-inner { display:flex; align-items:center; justify-content:center; gap:48px; flex-wrap:wrap; }
+    .strip-item { text-align:center; }
+    .strip-item strong { display:block; font-size:24px; font-weight:900; color:var(--accent); }
+    .strip-item span   { font-size:12px; font-weight:500; color:var(--ink3); text-transform:uppercase; letter-spacing:.08em; }
+    .strip-sep { width:1px; height:40px; background:var(--border); }
+    @media(max-width:600px){ .strip-sep { display:none; } }
+
+    /* PROBLEMA */
+    .prob-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; margin-top:64px; }
+    @media(max-width:760px){ .prob-grid { grid-template-columns:1fr; gap:40px; } }
+    .prob-list { list-style:none; display:flex; flex-direction:column; gap:16px; }
+    .prob-list li { display:flex; gap:14px; align-items:flex-start; font-size:16px; color:var(--ink2); }
+    .prob-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; background:#fff2f2; }
+    .prob-quote { background:var(--primary); border-radius:var(--radius-lg); padding:40px; color:#fff; }
+    .pq-icon { font-size:40px; margin-bottom:20px; }
+    .pq-text { font-size:22px; font-weight:700; line-height:1.4; margin-bottom:24px; }
+    .pq-author { display:flex; align-items:center; gap:14px; padding-top:24px; border-top:1px solid rgba(255,255,255,.12); }
+    .pq-avatar { width:44px; height:44px; border-radius:50%; background:rgba(59,130,246,.3); display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .pq-author strong { font-size:14px; display:block; }
+    .pq-author span   { font-size:12px; color:rgba(255,255,255,.5); }
+
+    /* EXP */
+    .exp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:56px; }
+    @media(max-width:760px){ .exp-grid { grid-template-columns:1fr; } }
+    .exp-card { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; box-shadow:var(--shadow); transition:transform .25s,box-shadow .25s; position:relative; overflow:hidden; }
+    .exp-card:hover { transform:translateY(-5px); box-shadow:var(--shadow-md); }
+    .exp-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent-lt)); }
+    .exp-num { font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:16px; }
+    .exp-icon { width:54px; height:54px; background:var(--accent-bg); border:1px solid rgba(29,78,216,.2); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:20px; }
+    .exp-card h3 { font-size:18px; font-weight:800; margin-bottom:10px; }
+    .exp-card p  { font-size:14px; color:var(--ink3); line-height:1.75; margin-bottom:20px; }
+    .exp-bullets { list-style:none; display:flex; flex-direction:column; gap:8px; }
+    .exp-bullets li { font-size:13px; color:var(--ink2); display:flex; gap:8px; }
+    .exp-bullets li::before { content:'&#10003;'; color:var(--accent); font-weight:700; flex-shrink:0; }
+
+    /* TABS */
+    .learn-tabs { display:flex; gap:8px; margin:40px 0 32px; flex-wrap:wrap; }
+    .learn-tab { background:var(--bg2); border:1px solid var(--border); border-radius:100px; padding:8px 20px; font-size:14px; font-weight:600; color:var(--ink3); cursor:pointer; transition:all .2s; user-select:none; }
+    .learn-tab.active { background:var(--primary); border-color:var(--primary); color:#fff; }
+    .learn-panel { display:none; }
+    .learn-panel.active { display:grid; grid-template-columns:1fr 1fr; gap:24px; animation:fadeUp .3s ease; }
+    @media(max-width:680px){ .learn-panel.active { grid-template-columns:1fr; } }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+    .learn-item { display:flex; gap:16px; padding:20px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg2); transition:border-color .2s; }
+    .learn-item:hover { border-color:var(--accent); }
+    .learn-icon { width:44px; height:44px; background:var(--accent-bg); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+    .learn-item strong { font-size:15px; display:block; margin-bottom:4px; }
+    .learn-item p      { font-size:13px; color:var(--ink3); }
+
+    /* PARA QUEM */
+    .fw-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:56px; }
+    @media(max-width:680px){ .fw-grid { grid-template-columns:1fr; } }
+    .fw-card { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:36px; }
+    .fw-card.yes { border-top:3px solid #22c55e; }
+    .fw-card.no  { border-top:3px solid #ef4444; }
+    .fw-head { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
+    .fw-badge { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .fw-card.yes .fw-badge { background:#f0fdf4; }
+    .fw-card.no  .fw-badge { background:#fef2f2; }
+    .fw-head h3 { font-size:17px; font-weight:800; }
+    .fw-list { list-style:none; display:flex; flex-direction:column; gap:12px; }
+    .fw-list li { font-size:15px; color:var(--ink2); display:flex; gap:10px; align-items:flex-start; }
+    .fw-check { width:20px; height:20px; border-radius:50%; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+    .fw-card.yes .fw-check { background:#f0fdf4; color:#22c55e; }
+    .fw-card.no  .fw-check { background:#fef2f2; color:#ef4444; }
+
+    /* DEPOIMENTOS */
+    .test-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:56px; }
+    @media(max-width:820px){ .test-grid { grid-template-columns:1fr; } }
+    .test-card { border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; background:var(--bg); box-shadow:var(--shadow); display:flex; flex-direction:column; gap:16px; }
+    .test-stars { color:var(--accent); font-size:14px; letter-spacing:2px; }
+    .test-card blockquote { font-size:15px; color:var(--ink2); line-height:1.75; flex:1; }
+    .test-author { display:flex; align-items:center; gap:12px; padding-top:16px; border-top:1px solid var(--border); }
+    .test-avatar { width:40px; height:40px; background:var(--accent-bg); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .test-author strong { font-size:14px; display:block; }
+    .test-author span   { font-size:12px; color:var(--ink3); }
+
+    /* SOBRE */
+    .about-inner { display:grid; grid-template-columns:320px 1fr; gap:72px; align-items:start; margin-top:64px; }
+    @media(max-width:820px){ .about-inner { grid-template-columns:1fr; gap:40px; } }
+    .about-photo { background:var(--primary); border-radius:var(--radius-lg); aspect-ratio:4/5; display:flex; align-items:center; justify-content:center; font-size:80px; color:rgba(255,255,255,.25); position:relative; overflow:hidden; box-shadow:var(--shadow-lg); }
+    .about-photo-label { position:absolute; bottom:20px; left:20px; right:20px; background:rgba(255,255,255,.10); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.2); border-radius:12px; padding:14px 16px; color:#fff; }
+    .about-photo-label strong { font-size:16px; display:block; margin-bottom:2px; }
+    .about-photo-label span   { font-size:12px; color:rgba(255,255,255,.55); }
+    .about-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:32px; }
+    .about-stat { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:18px; text-align:center; }
+    .about-stat strong { display:block; font-size:26px; font-weight:900; color:var(--accent); margin-bottom:4px; }
+    .about-stat span { font-size:12px; color:var(--ink3); }
+    .about-bio p { font-size:15px; color:var(--ink2); line-height:1.85; margin-bottom:16px; }
+    .about-quote { margin-top:24px; padding:20px 26px; background:var(--accent-bg); border-left:3px solid var(--accent); border-radius:0 12px 12px 0; font-size:16px; font-style:italic; color:var(--ink); line-height:1.6; }
+
+    /* EVENTO */
+    .event-section { background:var(--primary); color:#fff; }
+    .event-section .eyebrow { color:var(--accent-lt); background:rgba(59,130,246,.15); border-color:rgba(59,130,246,.3); }
+    .event-section .section-title { color:#fff; }
+    .event-section .section-sub   { color:rgba(255,255,255,.6); }
+    .details-grid { display:grid; grid-template-columns:2fr 1fr; gap:48px; align-items:start; margin-top:56px; }
+    @media(max-width:760px){ .details-grid { grid-template-columns:1fr; } }
+    .detail-rows { display:flex; flex-direction:column; gap:16px; }
+    .detail-row { display:flex; gap:20px; align-items:flex-start; padding:22px 24px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius); }
+    .detail-icon { width:46px; height:46px; background:rgba(59,130,246,.2); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+    .detail-label { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-lt); margin-bottom:4px; }
+    .detail-value { font-size:18px; font-weight:800; }
+    .detail-sub   { font-size:13px; color:rgba(255,255,255,.5); margin-top:2px; }
+    .price-card { background:#fff; border-radius:var(--radius-lg); padding:36px 28px; text-align:center; position:sticky; top:100px; box-shadow:var(--shadow-lg); }
+    .price-label { font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin-bottom:8px; }
+    .price-main { font-size:48px; font-weight:900; color:var(--ink); letter-spacing:-.03em; margin-bottom:4px; }
+    .price-main sup { font-size:22px; vertical-align:top; margin-top:10px; }
+    .price-note { font-size:12px; color:var(--ink3); margin-bottom:28px; }
+    .price-features { list-style:none; text-align:left; display:flex; flex-direction:column; gap:12px; margin-bottom:28px; }
+    .price-features li { display:flex; gap:10px; font-size:14px; color:var(--ink2); }
+    .price-features li::before { content:'✓'; color:#22c55e; font-weight:700; flex-shrink:0; }
+    .price-urgency { background:#eff6ff; border:1px solid rgba(29,78,216,.3); border-radius:10px; padding:12px; font-size:13px; color:#1e3a8a; margin-top:18px; }
+
+    /* FAQ */
+    .faq-list { max-width:720px; margin:56px auto 0; display:flex; flex-direction:column; gap:10px; }
+    .faq-item { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .faq-q { width:100%; text-align:left; background:none; border:none; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; color:var(--ink); padding:20px 22px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:16px; transition:background .15s; }
+    .faq-q:hover { background:var(--bg2); }
+    .faq-chevron { width:28px; height:28px; border-radius:50%; background:var(--bg2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--ink3); transition:transform .3s,background .2s; flex-shrink:0; }
+    .faq-item.open .faq-chevron { transform:rotate(180deg); background:var(--accent-bg); border-color:rgba(29,78,216,.3); color:var(--accent); }
+    .faq-a { max-height:0; overflow:hidden; transition:max-height .35s ease; }
+    .faq-item.open .faq-a { max-height:400px; }
+    .faq-a-inner { padding:18px 22px 22px; font-size:15px; color:var(--ink2); line-height:1.8; border-top:1px solid var(--border); }
+
+    /* FINAL CTA */
+    .final-cta { background:linear-gradient(135deg,#111111 0%,#1d3a7a 100%); padding:100px 0 120px; text-align:center; position:relative; overflow:hidden; }
+    .final-cta::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:800px; height:800px; background:radial-gradient(circle,rgba(212,160,23,.12) 0%,transparent 65%); pointer-events:none; }
+    .final-cta > * { position:relative; z-index:1; }
+    .final-cta .eyebrow { color:var(--accent-lt); background:rgba(212,160,23,.15); border-color:rgba(212,160,23,.3); margin-bottom:24px; }
+    .final-cta h2 { font-size:clamp(30px,5.5vw,54px); font-weight:900; line-height:1.1; color:#fff; max-width:680px; margin:0 auto 20px; letter-spacing:-.02em; }
+    .final-cta h2 mark { background:linear-gradient(135deg,var(--accent),var(--accent-lt)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .final-cta p { font-size:17px; color:rgba(255,255,255,.6); max-width:520px; margin:0 auto 44px; }
+    .btn-white { display:inline-flex; align-items:center; background:#fff; color:var(--primary); font-weight:700; font-size:16px; padding:16px 36px; border-radius:100px; text-decoration:none; transition:transform .2s,box-shadow .2s; box-shadow:0 8px 28px rgba(0,0,0,.2); }
+    .btn-white:hover { transform:translateY(-2px); box-shadow:0 12px 36px rgba(0,0,0,.3); }
+    .final-meta { margin-top:36px; font-size:13px; color:rgba(255,255,255,.4); display:flex; justify-content:center; gap:20px; flex-wrap:wrap; }
+    .final-meta span::before { content:'·'; margin-right:8px; }
+    .final-meta span:first-child::before { content:''; }
+
+    /* FOOTER */
+    footer { background:var(--bg2); border-top:1px solid var(--border); padding:48px 0 32px; }
+    .footer-inner { display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:48px; margin-bottom:40px; }
+    @media(max-width:700px){ .footer-inner { grid-template-columns:1fr; gap:32px; } }
+    .footer-brand p { font-size:14px; color:var(--ink3); max-width:260px; margin-top:10px; line-height:1.7; }
+    .footer-col h4 { font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); margin-bottom:16px; }
+    .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+    .footer-col a  { font-size:14px; color:var(--ink2); text-decoration:none; }
+    .footer-col a:hover { color:var(--accent); }
+    .footer-bottom { padding-top:24px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+    .footer-bottom p { font-size:13px; color:var(--ink3); }
+
+    /* STICKY */
+    #stickyBar { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border-top:1px solid var(--border); z-index:300; padding:14px 28px; display:flex; align-items:center; justify-content:space-between; gap:16px; box-shadow:0 -4px 20px rgba(0,0,0,.07); transition:opacity .3s,transform .3s; }
+    #stickyBar.hidden { opacity:0; pointer-events:none; transform:translateY(100%); }
+    .sticky-left p { font-size:14px; color:var(--ink2); }
+    .sticky-left strong { color:var(--ink); }
+    @media(max-width:560px){ #stickyBar { flex-direction:column; text-align:center; } }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">DN7 <span class="nav-logo-badge">2&ordf; ED.</span></a>
+      <ul class="nav-links">
+        <li><a href="#evento">O Evento</a></li>
+        <li><a href="#conteudo">Conte&uacute;do</a></li>
+        <li><a href="#rogerio">Rog&eacute;rio</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a href="https://www.sympla.com.br/evento/dn7-desenvolvimento-conexoes-ative-seu-potencial-infinito/3367934" class="btn-primary nav-cta" target="_blank" rel="noopener">Garantir vaga &mdash; R$&nbsp;67</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-chips">
+          <div class="chip">&#128197; 18 de Abril de 2026</div>
+          <div class="chip">&#128205; Curitiba &mdash; PR</div>
+          <div class="chip">&#9889; Vagas Limitadas</div>
+        </div>
+        <h1>Voc&ecirc; n&atilde;o est&aacute; travado.<br>Voc&ecirc; est&aacute; no<br><mark>ambiente errado.</mark></h1>
+        <p class="hero-desc">Em 2 horas voc&ecirc; vai descobrir seu perfil comportamental, ativar seus talentos naturais e se conectar com pessoas que est&atilde;o na mesma jornada de crescimento.</p>
+        <div class="hero-actions">
+          <a href="https://www.sympla.com.br/evento/dn7-desenvolvimento-conexoes-ative-seu-potencial-infinito/3367934" class="btn-primary" target="_blank" rel="noopener">Quero meu ingresso &rarr;</a>
+          <a href="#evento" class="btn-outline">Ver o que &eacute; o DN7</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>2h</strong><span>de experi&ecirc;ncia</span></div>
+          <div class="hero-stat"><strong>100%</strong><span>pr&aacute;tico</span></div>
+          <div class="hero-stat"><strong>2&ordf;</strong><span>edi&ccedil;&atilde;o</span></div>
+        </div>
+      </div>
+      <div class="hero-visual" style="position:relative;">
+        <div class="hero-card-main">
+          <p class="hc-label">O que voc&ecirc; vai viver</p>
+          <p class="hc-title">DN7 &middot; Desenvolvimento &amp; Conex&otilde;es</p>
+          <div class="hc-row">
+            <div class="hc-icon">&#129504;</div>
+            <div><strong>Perfil Comportamental</strong><p>Descubra como voc&ecirc; pensa e decide sob press&atilde;o.</p></div>
+          </div>
+          <div class="hc-row">
+            <div class="hc-icon">&#128640;</div>
+            <div><strong>Talentos para Vendas</strong><p>Identifique seus pontos fortes e use para crescer.</p></div>
+          </div>
+          <div class="hc-row">
+            <div class="hc-icon">&#129309;</div>
+            <div><strong>Networking com Prop&oacute;sito</strong><p>Conex&otilde;es reais com pessoas que evoluem.</p></div>
+          </div>
+        </div>
+        <div class="hero-float">
+          <div class="dot">&#127919;</div>
+          <div><strong>Vagas limitadas</strong><span>Para manter a qualidade</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="container">
+    <div class="strip-inner">
+      <div class="strip-item"><strong>2&ordf;</strong><span>Edi&ccedil;&atilde;o Presencial</span></div>
+      <div class="strip-sep"></div>
+      <div class="strip-item"><strong>+40</strong><span>Certifica&ccedil;&otilde;es</span></div>
+      <div class="strip-sep"></div>
+      <div class="strip-item"><strong>R$&nbsp;13M+</strong><span>Em projetos</span></div>
+      <div class="strip-sep"></div>
+      <div class="strip-item"><strong>2&ndash;3h</strong><span>Experi&ecirc;ncia</span></div>
+      <div class="strip-sep"></div>
+      <div class="strip-item"><strong>100%</strong><span>Pr&aacute;tico</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEMA -->
+<section style="background:var(--bg);">
+  <div class="container">
+    <div style="max-width:560px;">
+      <div class="eyebrow">O diagn&oacute;stico</div>
+      <h2 class="section-title">A maioria tenta crescer sozinha.<br>E isso atrasa anos.</h2>
+      <p class="section-sub">Falta de clareza sobre talentos, aus&ecirc;ncia de dire&ccedil;&atilde;o e o ambiente errado s&atilde;o os tr&ecirc;s maiores bloqueios de desenvolvimento profissional.</p>
+    </div>
+    <div class="prob-grid">
+      <div>
+        <p style="font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#ef4444;margin-bottom:20px;">Sem o ambiente certo</p>
+        <ul class="prob-list">
+          <li><div class="prob-icon">&#128532;</div><span>Falta clareza sobre o que voc&ecirc; &eacute; bom de verdade</span></li>
+          <li><div class="prob-icon">&#128260;</div><span>Ciclo repetitivo sem evolu&ccedil;&atilde;o real</span></li>
+          <li><div class="prob-icon">&#128683;</div><span>Conex&otilde;es vazias e sem prop&oacute;sito</span></li>
+          <li><div class="prob-icon">&#9203;</div><span>Anos perdidos sem dire&ccedil;&atilde;o estrat&eacute;gica</span></li>
+        </ul>
+      </div>
+      <div class="prob-quote">
+        <div class="pq-icon">&#128172;</div>
+        <p class="pq-text">&ldquo;Crescimento profissional n&atilde;o acontece apenas com conte&uacute;do, mas com o ambiente e as pessoas certas ao nosso redor.&rdquo;</p>
+        <div class="pq-author">
+          <div class="pq-avatar">&#127908;</div>
+          <div><strong>Rog&eacute;rio Schultz</strong><span>Criador do DN7</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIÊNCIAS -->
+<section style="background:var(--bg2);" id="evento">
+  <div class="container">
+    <div class="eyebrow">Uma noite, tr&ecirc;s transforma&ccedil;&otilde;es</div>
+    <h2 class="section-title">O que acontece dentro do DN7</h2>
+    <p class="section-sub">N&atilde;o &eacute; um evento para assistir. &Eacute; uma experi&ecirc;ncia desenhada para voc&ecirc; sair com clareza, habilidade e conex&otilde;es reais.</p>
+    <div class="exp-grid">
+      <div class="exp-card">
+        <div class="exp-num">01 &mdash; Treinamento</div>
+        <div class="exp-icon">&#129504;</div>
+        <h3>Ative seus Talentos</h3>
+        <p>Descubra seu perfil comportamental e entenda como seus talentos naturais podem ser usados para crescer e vender com mais autenticidade.</p>
+        <ul class="exp-bullets">
+          <li>Identificar seu perfil comportamental</li>
+          <li>Descobrir seus talentos naturais</li>
+          <li>Decis&otilde;es com mais clareza e confian&ccedil;a</li>
+          <li>Crescer com mais consist&ecirc;ncia e resultado</li>
+        </ul>
+      </div>
+      <div class="exp-card">
+        <div class="exp-num">02 &mdash; Networking</div>
+        <div class="exp-icon">&#129309;</div>
+        <h3>Conex&otilde;es com Prop&oacute;sito</h3>
+        <p>Networking guiado e estruturado &mdash; n&atilde;o aleat&oacute;rio. Din&acirc;micas organizadas para gerar conversas reais, sem desconforto e sem artificialidade.</p>
+        <ul class="exp-bullets">
+          <li>Conversas com prop&oacute;sito real</li>
+          <li>Pessoas alinhadas aos seus objetivos</li>
+          <li>Ambiente sem interesse for&ccedil;ado</li>
+          <li>Din&acirc;micas que tornam tudo natural</li>
+        </ul>
+      </div>
+      <div class="exp-card">
+        <div class="exp-num">03 &mdash; Clareza</div>
+        <div class="exp-icon">&#127919;</div>
+        <h3>Saia com Dire&ccedil;&atilde;o</h3>
+        <p>Voc&ecirc; n&atilde;o sai apenas com conhecimento. Voc&ecirc; sai com um plano. Entenda como seu perfil se traduz em resultados e d&ecirc; o pr&oacute;ximo passo com confian&ccedil;a.</p>
+        <ul class="exp-bullets">
+          <li>Clareza dos seus talentos naturais</li>
+          <li>Como usar isso para crescer</li>
+          <li>Conex&otilde;es reais com pessoas certas</li>
+          <li>Pr&oacute;ximos passos pr&aacute;ticos</li>
+        </ul>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:48px;">
+      <a href="https://www.sympla.com.br/evento/dn7-desenvolvimento-conexoes-ative-seu-potencial-infinito/3367934" class="btn-primary" target="_blank" rel="noopener">Quero meu ingresso &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- TABS CONTEÚDO -->
+<section style="background:var(--bg);" id="conteudo">
+  <div class="container">
+    <div class="eyebrow">Conte&uacute;do + Pr&aacute;tica</div>
+    <h2 class="section-title">O que voc&ecirc; vai aprender e aplicar</h2>
+    <p class="section-sub">Tudo &eacute; focado em pr&aacute;tica imediata durante o pr&oacute;prio evento.</p>
+    <div class="learn-tabs">
+      <div class="learn-tab active" onclick="switchTab('train',this)">&#127891; Treinamento</div>
+      <div class="learn-tab" onclick="switchTab('net',this)">&#127758; Networking</div>
+      <div class="learn-tab" onclick="switchTab('res',this)">&#9889; Resultados</div>
+    </div>
+    <div id="tab-train" class="learn-panel active">
+      <div class="learn-item"><div class="learn-icon">&#128269;</div><div><strong>Perfil Comportamental</strong><p>Descubra como voc&ecirc; pensa, age e decide &mdash; com base em m&eacute;todo validado.</p></div></div>
+      <div class="learn-item"><div class="learn-icon">&#128142;</div><div><strong>Talentos Naturais</strong><p>Identifique seus pontos fortes e entenda como aplic&aacute;-los em vendas e resultados.</p></div></div>
+      <div class="learn-item"><div class="learn-icon">&#128200;</div><div><strong>Crescimento Profissional</strong><p>Estrat&eacute;gias pr&aacute;ticas para usar sua identidade a favor do seu crescimento.</p></div></div>
+      <div class="learn-item"><div class="learn-icon">&#127919;</div><div><strong>Decis&otilde;es com Confian&ccedil;a</strong><p>Clareza de valores e talentos para decis&otilde;es mais assertivas e com menos ang&uacute;stia.</p></div></div>
+    </div>
+    <div id="tab-net" class="learn-panel">
+      <div class="learn-item"><div class="learn-icon">&#128172;</div><div><strong>Conversas com Prop&oacute;sito</strong><p>Din&acirc;micas que criam conversas naturais sem o desconforto do networking tradicional.</p></div></div>
+      <div class="learn-item"><div class="learn-icon">&#128279;</div><div><strong>Conex&otilde;es Alinhadas</strong><p>Voc&ecirc; se conecta com pessoas que est&atilde;o buscando o mesmo crescimento.</p></div></div>
+      <div class="learn-item"><div class="learn-icon">&#128737;</div><div><strong>Sem Artificialidade</strong><p>Evento desenhado para eliminar o interesse for&ccedil;ado &mdash; as conex&otilde;es surgem naturalmente.</p></div></div>
+      <div class="learn-item"><div class="learn-icon">&#127807;</div><div><strong>Pode Chegar Sozinho</strong><p>Muitas pessoas chegam sem conhecer ningu&eacute;m e saem com conex&otilde;es que duram.</p></div></div>
+    </div>
+    <div id="tab-res" class="learn-panel">
+      <div class="learn-item"><div class="learn-icon">&#129517;</div><div><strong>Clareza de Dire&ccedil;&atilde;o</strong><p>Sai do evento sabendo onde quer chegar e como seus talentos chegam l&aacute; com voc&ecirc;.</p></div></div>
+      <div class="learn-item"><div class="learn-icon">&#129309;</div><div><strong>Network Real</strong><p>Contatos com pessoas que est&atilde;o na mesma busca &mdash; reais, n&atilde;o superficiais.</p></div></div>
+      <div class="learn-item"><div class="learn-icon">&#128293;</div><div><strong>Motiva&ccedil;&atilde;o Sustent&aacute;vel</strong><p>N&atilde;o &eacute; motiva&ccedil;&atilde;o vazia &mdash; &eacute; dire&ccedil;&atilde;o. Voc&ecirc; sai sabendo o pr&oacute;ximo passo concreto.</p></div></div>
+      <div class="learn-item"><div class="learn-icon">&#9889;</div><div><strong>Tudo em 2 horas</strong><p>Sem enrola&ccedil;&atilde;o. Experi&ecirc;ncia densa, focada e com resultado real em uma &uacute;nica noite.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PARA QUEM -->
+<section style="background:var(--bg2);">
+  <div class="container">
+    <div class="eyebrow">Fit ou n&atilde;o fit?</div>
+    <h2 class="section-title">O DN7 &eacute; feito para voc&ecirc;?</h2>
+    <p class="section-sub">Esse evento foi desenhado para um perfil espec&iacute;fico de pessoa.</p>
+    <div class="fw-grid">
+      <div class="fw-card yes">
+        <div class="fw-head"><div class="fw-badge">&#9989;</div><h3>&Eacute; para voc&ecirc; se&hellip;</h3></div>
+        <ul class="fw-list">
+          <li><div class="fw-check">&#10003;</div>Quer crescer profissionalmente de forma consistente</li>
+          <li><div class="fw-check">&#10003;</div>Sente que est&aacute; travado sem saber por qu&ecirc;</li>
+          <li><div class="fw-check">&#10003;</div>Quer melhorar sua comunica&ccedil;&atilde;o e seus resultados</li>
+          <li><div class="fw-check">&#10003;</div>Quer estar perto de pessoas que realmente evoluem</li>
+          <li><div class="fw-check">&#10003;</div>Est&aacute; em transi&ccedil;&atilde;o de carreira ou abrindo um neg&oacute;cio</li>
+          <li><div class="fw-check">&#10003;</div>Busca conex&otilde;es reais, n&atilde;o redes sociais aleat&oacute;rias</li>
+        </ul>
+      </div>
+      <div class="fw-card no">
+        <div class="fw-head"><div class="fw-badge">&#10060;</div><h3>N&atilde;o &eacute; para voc&ecirc; se&hellip;</h3></div>
+        <ul class="fw-list">
+          <li><div class="fw-check">&#10005;</div>Voc&ecirc; busca apenas conte&uacute;do superficial e te&oacute;rico</li>
+          <li><div class="fw-check">&#10005;</div>N&atilde;o est&aacute; disposto a participar ativamente</li>
+          <li><div class="fw-check">&#10005;</div>N&atilde;o valoriza o poder do ambiente e das conex&otilde;es</li>
+          <li><div class="fw-check">&#10005;</div>Prefere eventos em que basta sentar e assistir</li>
+          <li><div class="fw-check">&#10005;</div>N&atilde;o tem inten&ccedil;&atilde;o de colocar nada em pr&aacute;tica</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEPOIMENTOS -->
+<section style="background:var(--bg);">
+  <div class="container">
+    <div class="eyebrow">Quem participou diz</div>
+    <h2 class="section-title">Resultados reais de pessoas reais</h2>
+    <p class="section-sub">Da 1&ordf; edi&ccedil;&atilde;o do DN7, em Curitiba.</p>
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="test-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>&ldquo;Cheguei sem conhecer ningu&eacute;m e sa&iacute; com conex&otilde;es que j&aacute; impactaram meu neg&oacute;cio. A din&acirc;mica do evento torna tudo muito natural &mdash; n&atilde;o tem aquele desconforto t&iacute;pico de networking.&rdquo;</blockquote>
+        <div class="test-author"><div class="test-avatar">&#128105;&#8205;&#128188;</div><div><strong>Participante da 1&ordf; Edi&ccedil;&atilde;o</strong><span>Empreendedora &middot; Curitiba</span></div></div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>&ldquo;Em 2 horas aprendi mais sobre meu pr&oacute;prio perfil do que em meses de leitura. O treinamento &eacute; direto ao ponto e voc&ecirc; aplica na hora.&rdquo;</blockquote>
+        <div class="test-author"><div class="test-avatar">&#128104;&#8205;&#128188;</div><div><strong>Participante da 1&ordf; Edi&ccedil;&atilde;o</strong><span>Gestor Comercial &middot; Curitiba</span></div></div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>&ldquo;Estava em transi&ccedil;&atilde;o de carreira e sem clareza. O DN7 me ajudou a entender meus talentos e como us&aacute;-los na pr&aacute;tica. Sa&iacute; com dire&ccedil;&atilde;o e pessoas na mesma busca.&rdquo;</blockquote>
+        <div class="test-author"><div class="test-avatar">&#129489;</div><div><strong>Participante da 1&ordf; Edi&ccedil;&atilde;o</strong><span>Em Transi&ccedil;&atilde;o &middot; Curitiba</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOBRE ROGÉRIO -->
+<section style="background:var(--bg2);" id="rogerio">
+  <div class="container">
+    <div class="eyebrow">Quem est&aacute; por tr&aacute;s</div>
+    <h2 class="section-title">A hist&oacute;ria que tornou o DN7 poss&iacute;vel</h2>
+    <div class="about-inner">
+      <div class="about-photo">
+        &#127908;
+        <div class="about-photo-label">
+          <strong>Rog&eacute;rio Schultz</strong>
+          <span>Criador do DN7 &middot; Curitiba</span>
+        </div>
+      </div>
+      <div>
+        <div class="about-stats-row">
+          <div class="about-stat"><strong>+40</strong><span>Certifica&ccedil;&otilde;es</span></div>
+          <div class="about-stat"><strong>R$&nbsp;13M+</strong><span>Em projetos</span></div>
+          <div class="about-stat"><strong>5 anos</strong><span>Estudo comportamental</span></div>
+        </div>
+        <div class="about-bio">
+          <p>Empres&aacute;rio formado em Engenharia de Produ&ccedil;&atilde;o, com especializa&ccedil;&otilde;es em Planejamento e Gerenciamento Estrat&eacute;gico e Gest&atilde;o Estrat&eacute;gica Financeira, pela PUC-PR.</p>
+          <p>Participou diretamente de projetos comerciais que ultrapassaram <strong>R$&nbsp;13 milh&otilde;es em vendas</strong> &mdash; experi&ecirc;ncia que refor&ccedil;ou sua vis&atilde;o sobre estrat&eacute;gia, comunica&ccedil;&atilde;o e desenvolvimento profissional.</p>
+          <p>Nos &uacute;ltimos 5 anos, dedicou-se ao estudo de comportamento humano, PNL e intelig&ecirc;ncia emocional, acumulando mais de 40 forma&ccedil;&otilde;es e certifica&ccedil;&otilde;es na &aacute;rea.</p>
+          <p>A partir dessa combina&ccedil;&atilde;o entre <strong>experi&ecirc;ncia pr&aacute;tica em neg&oacute;cios</strong> e estudo profundo do comportamento humano, nasceu o DN7 &mdash; um encontro presencial que une desenvolvimento e networking de forma aut&ecirc;ntica.</p>
+          <div class="about-quote">&ldquo;Crescimento profissional n&atilde;o acontece apenas com conte&uacute;do, mas com o ambiente e as pessoas certas ao nosso redor.&rdquo;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DETALHES -->
+<section class="event-section">
+  <div class="container">
+    <div class="eyebrow">2&ordf; Edi&ccedil;&atilde;o &middot; Evento Presencial</div>
+    <h2 class="section-title">Detalhes da experi&ecirc;ncia</h2>
+    <p class="section-sub">Tudo que voc&ecirc; precisa saber antes de garantir sua vaga.</p>
+    <div class="details-grid">
+      <div class="detail-rows">
+        <div class="detail-row"><div class="detail-icon">&#128197;</div><div><div class="detail-label">Data</div><div class="detail-value">18 de Abril de 2026</div><div class="detail-sub">Sexta-feira &agrave; noite</div></div></div>
+        <div class="detail-row"><div class="detail-icon">&#128205;</div><div><div class="detail-label">Local</div><div class="detail-value">Curitiba &mdash; PR</div><div class="detail-sub">Endere&ccedil;o confirmado por e-mail ap&oacute;s a compra</div></div></div>
+        <div class="detail-row"><div class="detail-icon">&#9201;</div><div><div class="detail-label">Dura&ccedil;&atilde;o</div><div class="detail-value">2 a 3 horas</div><div class="detail-sub">Experi&ecirc;ncia densa, focada e pr&aacute;tica</div></div></div>
+        <div class="detail-row"><div class="detail-icon">&#127919;</div><div><div class="detail-label">Formato</div><div class="detail-value">100% Pr&aacute;tico</div><div class="detail-sub">Din&acirc;micas, exerc&iacute;cios e networking guiado &mdash; n&atilde;o &eacute; palestra</div></div></div>
+        <div class="detail-row"><div class="detail-icon">&#128101;</div><div><div class="detail-label">Vagas</div><div class="detail-value">Limitadas</div><div class="detail-sub">Para manter a qualidade de aprendizado e conex&otilde;es</div></div></div>
+      </div>
+      <div class="price-card">
+        <p class="price-label">Investimento</p>
+        <div class="price-main"><sup>R$</sup>67</div>
+        <p class="price-note">+ taxa de servi&ccedil;o Sympla</p>
+        <ul class="price-features">
+          <li>Treinamento de perfil comportamental</li>
+          <li>Din&acirc;micas de networking guiado</li>
+          <li>Conte&uacute;do sobre talentos e vendas</li>
+          <li>Certificado de participa&ccedil;&atilde;o</li>
+          <li>Facilitador com +40 certifica&ccedil;&otilde;es</li>
+        </ul>
+        <a href="https://www.sympla.com.br/evento/dn7-desenvolvimento-conexoes-ative-seu-potencial-infinito/3367934" class="btn-primary" style="width:100%;justify-content:center;font-size:16px;padding:17px;" target="_blank" rel="noopener">Garantir minha vaga &rarr;</a>
+        <div class="price-urgency">&#9889; Vagas limitadas para manter a qualidade da experi&ecirc;ncia.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="background:var(--bg);" id="faq">
+  <div class="container-sm">
+    <div style="text-align:center;">
+      <div class="eyebrow" style="margin:0 auto 20px;">D&uacute;vidas frequentes</div>
+      <h2 class="section-title">Perguntas e respostas</h2>
+      <p class="section-sub" style="margin:16px auto 0;text-align:center;">Tudo que voc&ecirc; pode estar se perguntando antes de decidir.</p>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Preciso ter experi&ecirc;ncia pr&eacute;via em lideran&ccedil;a para participar?<div class="faq-chevron">&#9660;</div></button>
+        <div class="faq-a"><div class="faq-a-inner">N&atilde;o. O DN7 &eacute; para qualquer pessoa que queira crescer &mdash; seja profissional, empreendedor ou algu&eacute;m em transi&ccedil;&atilde;o. Voc&ecirc; vai aprender princ&iacute;pios aplic&aacute;veis para qualquer &aacute;rea e perfil.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Tenho vergonha / n&atilde;o conhe&ccedil;o ningu&eacute;m. Posso participar mesmo assim?<div class="faq-chevron">&#9660;</div></button>
+        <div class="faq-a"><div class="faq-a-inner">Sim. Muitas pessoas chegam ao DN7 sozinhas buscando novas conex&otilde;es &mdash; e isso &eacute; totalmente normal. O evento foi desenhado com din&acirc;micas guiadas que tornam as conversas naturais e leves. As conex&otilde;es acontecem durante a pr&oacute;pria experi&ecirc;ncia.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Quanto tempo dura o evento?<div class="faq-chevron">&#9660;</div></button>
+        <div class="faq-a"><div class="faq-a-inner">A experi&ecirc;ncia tem dura&ccedil;&atilde;o aproximada de 2 a 3 horas. O tempo &eacute; inteiramente dedicado a pr&aacute;tica, din&acirc;micas e networking guiado &mdash; sem enrola&ccedil;&atilde;o.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">As vagas s&atilde;o limitadas?<div class="faq-chevron">&#9660;</div></button>
+        <div class="faq-a"><div class="faq-a-inner">Sim. As vagas s&atilde;o propositalmente limitadas para preservar a qualidade da experi&ecirc;ncia, do aprendizado e das conex&otilde;es. Recomendamos garantir sua participa&ccedil;&atilde;o com anteced&ecirc;ncia.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">&Eacute; s&oacute; conte&uacute;do ou tem pr&aacute;tica?<div class="faq-chevron">&#9660;</div></button>
+        <div class="faq-a"><div class="faq-a-inner">O DN7 &eacute; focado em pr&aacute;tica. Voc&ecirc; vai participar de din&acirc;micas, exerc&iacute;cios e networking guiado. N&atilde;o &eacute; um evento para apenas ouvir &mdash; voc&ecirc; vai fazer.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Comprei o ingresso mas n&atilde;o vou poder ir. O que fa&ccedil;o?<div class="faq-chevron">&#9660;</div></button>
+        <div class="faq-a"><div class="faq-a-inner">Voc&ecirc; pode solicitar o cancelamento ou reembolso at&eacute; 48 horas antes do evento. A taxa de servi&ccedil;o da Sympla n&atilde;o &eacute; reembols&aacute;vel. Ap&oacute;s esse prazo, voc&ecirc; pode transferir o ingresso para outra pessoa. Caso o evento seja cancelado pela organiza&ccedil;&atilde;o, voc&ecirc; poder&aacute; participar de uma pr&oacute;xima edi&ccedil;&atilde;o ou solicitar reembolso integral (taxa Sympla n&atilde;o reembols&aacute;vel).</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container-sm">
+    <div class="eyebrow">18 de Abril &middot; Curitiba &middot; Vagas Limitadas</div>
+    <h2>Ou voc&ecirc; continua no mesmo lugar&hellip;<br>ou muda sua dire&ccedil;&atilde;o <mark>a partir daqui.</mark></h2>
+    <p>Em 2 horas voc&ecirc; vai entender seu perfil comportamental, descobrir seus talentos naturais e aprender como gerar mais resultado com o que j&aacute; tem.</p>
+    <a href="https://www.sympla.com.br/evento/dn7-desenvolvimento-conexoes-ative-seu-potencial-infinito/3367934" class="btn-white" target="_blank" rel="noopener">Quero meu ingresso &mdash; R$&nbsp;67</a>
+    <div class="final-meta">
+      <span>18 de Abril de 2026</span>
+      <span>Curitiba &mdash; PR</span>
+      <span>2 a 3 horas</span>
+      <span>Vagas Limitadas</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo" style="font-size:20px;">DN7 <span class="nav-logo-badge">2&ordf; ED.</span></a>
+        <p>Evento presencial de desenvolvimento profissional e networking guiado. Curitiba, 18 de Abril de 2026.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navega&ccedil;&atilde;o</h4>
+        <ul>
+          <li><a href="#evento">O Evento</a></li>
+          <li><a href="#conteudo">Conte&uacute;do</a></li>
+          <li><a href="#rogerio">Sobre Rog&eacute;rio</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Ingresso</h4>
+        <ul>
+          <li><a href="https://www.sympla.com.br/evento/dn7-desenvolvimento-conexoes-ative-seu-potencial-infinito/3367934" target="_blank" rel="noopener">Comprar na Sympla</a></li>
+          <li><a href="#faq">Pol&iacute;tica de reembolso</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 DN7 &mdash; Desenvolvimento &amp; Conex&otilde;es. Todos os direitos reservados.</p>
+      <p>Feito em Curitiba &mdash; PR</p>
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY BAR -->
+<div id="stickyBar" class="hidden">
+  <div class="sticky-left">
+    <p><strong>DN7 &middot; 2&ordf; Edi&ccedil;&atilde;o Presencial</strong> &mdash; 18/04 &middot; Curitiba &middot; Vagas limitadas</p>
+  </div>
+  <a href="https://www.sympla.com.br/evento/dn7-desenvolvimento-conexoes-ative-seu-potencial-infinito/3367934" class="btn-primary" style="padding:12px 24px;font-size:14px;" target="_blank" rel="noopener">Garantir vaga &mdash; R$&nbsp;67</a>
+</div>
+
+<script>
+  function toggleFaq(btn) {
+    var item = btn.closest('.faq-item');
+    var open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(function(el){ el.classList.remove('open'); });
+    if (!open) item.classList.add('open');
+  }
+  function switchTab(id, el) {
+    document.querySelectorAll('.learn-tab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('.learn-panel').forEach(function(p){ p.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('tab-'+id).classList.add('active');
+  }
+  var hero = document.getElementById('hero');
+  var bar  = document.getElementById('stickyBar');
+  new IntersectionObserver(function(entries){
+    bar.classList.toggle('hidden', entries[0].isIntersecting);
+  }, { threshold: 0.05 }).observe(hero);
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var t = document.querySelector(a.getAttribute('href'));
+      if(t){ e.preventDefault(); t.scrollIntoView({ behavior:'smooth', block:'start' }); }
+    });
+  });
+</script>
+</body>
+</html>
